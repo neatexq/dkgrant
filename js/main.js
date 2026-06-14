@@ -134,51 +134,35 @@ if (orderForm) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner"></span>';
 
-    /*
-    ──────────────────────────────────────────────────────────────
-    TODO: Підключіть реальну відправку одним із способів:
+    // ── Відправка заявки на Cloudflare Worker ──────────────────
+    // Замініть URL нижче на адресу вашого Worker'а
+    const WORKER_URL = 'https://dkgrant-form.YOUR-SUBDOMAIN.workers.dev';
 
-    ВАРІАНТ А — Telegram Bot API (безкоштовно, без реєстрації):
-    ─────────────────────────────────────────────────────────────
-    1. Відкрийте @BotFather в Telegram → /newbot → отримайте BOT_TOKEN
-    2. Напишіть вашому боту /start, потім зайдіть на:
-       https://api.telegram.org/bot<BOT_TOKEN>/getUpdates
-       — там знайдіть ваш chat_id
-    3. Замініть змінні нижче та розкоментуйте код:
+    let success = false;
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      success = res.ok;
+    } catch (err) {
+      success = false;
+    }
 
-    const BOT_TOKEN = 'YOUR_BOT_TOKEN';
-    const CHAT_ID   = 'YOUR_CHAT_ID';
-    const text = `
-    🚛 Нове замовлення з сайту!
-    📍 Звідки: ${data.from}
-    📍 Куди: ${data.to}
-    📦 Вантаж: ${data.cargo}
-    📅 Дата: ${data.date}
-    📞 Телефон: ${data.phone}
-    💬 Коментар: ${data.comment || 'немає'}
-    `;
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: CHAT_ID, text }),
-    });
-
-    ВАРІАНТ Б — EmailJS (безкоштовно до 200 листів/місяць):
-    ─────────────────────────────────────────────────────────────
-    1. Реєстрація: https://www.emailjs.com
-    2. Додайте Email Service (Gmail/Outlook)
-    3. Створіть Email Template з полями {{from}}, {{to}}, {{phone}}
-    4. Підключіть SDK у <head> і розкоментуйте:
-
-    await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', data);
-    ──────────────────────────────────────────────────────────────
-    */
-
-    // Симуляція відправки (поки без реального API)
-    await new Promise(r => setTimeout(r, 900));
-
-    // Show success
-    orderForm.style.display   = 'none';
-    formSuccess.style.display = 'block';
+    if (success) {
+      // Show success
+      orderForm.style.display   = 'none';
+      formSuccess.style.display = 'block';
+    } else {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ' +
+        '<span data-uk="Надіслати заявку" data-ru="Отправить заявку">' +
+        (document.documentElement.lang === 'ru' ? 'Отправить заявку' : 'Надіслати заявку') +
+        '</span>';
+      alert(document.documentElement.lang === 'ru'
+        ? 'Не удалось отправить заявку. Позвоните нам напрямую.'
+        : 'Не вдалося надіслати заявку. Зателефонуйте нам напряму.');
+    }
   });
 }
