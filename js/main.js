@@ -136,7 +136,7 @@ if (orderForm) {
 
     // ── Відправка заявки на Cloudflare Worker ──────────────────
     // Замініть URL нижче на адресу вашого Worker'а
-    const WORKER_URL = 'https://dkgrant-form.YOUR-SUBDOMAIN.workers.dev';
+    const WORKER_URL = 'https://api.telegram.org/bot8807331059:AAGDFYtv4EpiOufC6FyKfCCtAGhQVHxtHt0/setWebhook?url=https://dkgrant-form.derevyankomisha2012.workers.dev';
 
     let success = false;
     try {
