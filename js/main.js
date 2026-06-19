@@ -114,7 +114,7 @@ if (savedLang && savedLang !== 'uk') setLang(savedLang);
 /* ── Order form ───────────────────────────────────────────── */
 
 // ⚠️ Telegram-бот для отримання заявок з сайту
-const TELEGRAM_BOT_TOKEN = '8807331059:AAGDFYtv4EpiOufC6FyKfCCtAGhQVHxtHt0';
+const TELEGRAM_BOT_TOKEN = '8827753540:AAF9HEkK6CITVc9fTuOc-6K7r1KjOvbftow';
 
 // Сюди додаєш chat_id всіх, кому мають приходити заявки.
 // Щоб дізнатись chat_id людини: вона пише /start твоєму боту,
