@@ -112,6 +112,18 @@ const savedLang = localStorage.getItem('lang');
 if (savedLang && savedLang !== 'uk') setLang(savedLang);
 
 /* ── Order form ───────────────────────────────────────────── */
+
+// ⚠️ Telegram-бот для отримання заявок з сайту
+const TELEGRAM_BOT_TOKEN = '8807331059:AAGDFYtv4EpiOufC6FyKfCCtAGhQVHxtHt0';
+
+// Сюди додаєш chat_id всіх, кому мають приходити заявки.
+// Щоб дізнатись chat_id людини: вона пише /start твоєму боту,
+// потім відкриваєш https://api.telegram.org/bot<TOKEN>/getUpdates
+const TELEGRAM_CHAT_IDS = [
+  '1553938904',   // твій chat_id
+  // '0000000000', // ← сюди впишеш chat_id дядька, коли він напише /start боту
+];
+
 const orderForm    = document.getElementById('order-form');
 const formSuccess  = document.getElementById('form-success');
 const submitBtn    = document.getElementById('form-submit');
@@ -134,35 +146,44 @@ if (orderForm) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner"></span>';
 
-    // ── Відправка заявки на Cloudflare Worker ──────────────────
-    // Замініть URL нижче на адресу вашого Worker'а
-    const WORKER_URL = 'https://api.telegram.org/bot8807331059:AAGDFYtv4EpiOufC6FyKfCCtAGhQVHxtHt0/setWebhook?url=https://dkgrant-form.derevyankomisha2012.workers.dev';
+    // Назви типів вантажу для читабельного повідомлення
+    const cargoLabels = {
+      apartment:    'Квартирний переїзд',
+      office:       'Офісний переїзд',
+      furniture:    'Меблі / техніка',
+      construction: 'Будматеріали',
+      other:        'Інше',
+    };
 
-    let success = false;
+    const text =
+      '🚛 Нове замовлення з сайту!\n' +
+      `📍 Звідки: ${data.from}\n` +
+      `📍 Куди: ${data.to}\n` +
+      `📦 Вантаж: ${cargoLabels[data.cargo] || data.cargo}\n` +
+      `📅 Дата: ${data.date || 'не вказано'}\n` +
+      `📞 Телефон: ${data.phone}\n` +
+      `💬 Коментар: ${data.comment || 'немає'}`;
+
     try {
-      const res = await fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      success = res.ok;
-    } catch (err) {
-      success = false;
-    }
+      // Шлемо повідомлення кожному отримувачу окремим запитом
+      await Promise.all(
+        TELEGRAM_CHAT_IDS.map(chatId =>
+          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text }),
+          })
+        )
+      );
 
-    if (success) {
       // Show success
       orderForm.style.display   = 'none';
       formSuccess.style.display = 'block';
-    } else {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ' +
-        '<span data-uk="Надіслати заявку" data-ru="Отправить заявку">' +
-        (document.documentElement.lang === 'ru' ? 'Отправить заявку' : 'Надіслати заявку') +
-        '</span>';
-      alert(document.documentElement.lang === 'ru'
-        ? 'Не удалось отправить заявку. Позвоните нам напрямую.'
-        : 'Не вдалося надіслати заявку. Зателефонуйте нам напряму.');
+    } catch (err) {
+      console.error('Помилка відправки заявки:', err);
+      submitBtn.disabled  = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Спробувати ще раз</span>';
+      alert('Не вдалося відправити заявку. Перевірте інтернет-з\'єднання і спробуйте ще раз, або зателефонуйте нам напряму.');
     }
   });
 }
