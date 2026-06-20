@@ -121,9 +121,28 @@ const orderForm    = document.getElementById('order-form');
 const formSuccess  = document.getElementById('form-success');
 const submitBtn    = document.getElementById('form-submit');
 
+// Час відкриття форми — для перевірки на занадто швидке заповнення (боти)
+const formLoadedAt = Date.now();
+
 if (orderForm) {
   orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // ── Антиспам: honeypot ────────────────────────────────────
+    // Якщо приховане поле заповнене — це бот, мовчки ігноруємо.
+    const honeypot = orderForm.querySelector('[name="website"]').value.trim();
+    if (honeypot !== '') {
+      console.warn('Спам-бот заблоковано (honeypot)');
+      return;
+    }
+
+    // ── Антиспам: занадто швидке заповнення ───────────────────
+    // Жодна людина не заповнить форму швидше ніж за 3 секунди.
+    const elapsed = Date.now() - formLoadedAt;
+    if (elapsed < 3000) {
+      console.warn('Спам-бот заблоковано (занадто швидко)');
+      return;
+    }
 
     // Collect data
     const data = {

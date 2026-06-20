@@ -368,6 +368,9 @@
       <a href="https://t.me/+380675384031" target="_blank" rel="noopener" class="btn-outline-dark">
         <i class="fa-brands fa-telegram"></i> Telegram
       </a>
+      <a href="viber://chat?number=%2B380675384031" class="btn-outline-dark">
+        <i class="fa-brands fa-viber"></i> Viber
+      </a>
     </div>
   </div>
 </div>
@@ -394,6 +397,17 @@
             <div class="contact-value">
               <a href="tel:+380675384031">067 538 40 31</a><br>
               <a href="tel:+380997299470">099 729 94 70</a>
+            </div>
+            <div class="messenger-links">
+              <a href="viber://chat?number=%2B380675384031"
+                 class="msg-btn msg-viber">
+                <i class="fa-brands fa-viber"></i> Viber
+              </a>
+              <a href="https://t.me/+380675384031"
+                 target="_blank" rel="noopener"
+                 class="msg-btn msg-telegram">
+                <i class="fa-brands fa-telegram"></i> Telegram
+              </a>
             </div>
           </div>
         </div>
@@ -443,6 +457,13 @@
                data-ru="Заполните форму и мы перезвоним вам в течение 15 минут.">
               Заповніть форму і ми передзвонимо вам протягом 15 хвилин.
             </p>
+
+            <!-- Honeypot: приховане поле-пастка для спам-ботів.
+                 Людина його не бачить і не заповнює. -->
+            <div class="hp-field" aria-hidden="true">
+              <label for="website">Website</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
 
             <div class="form-row">
               <div class="form-group">

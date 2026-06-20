@@ -383,6 +383,16 @@ section { padding: 90px 24px; }
 
 /* ── ORDER FORM ──────────────────────────────────────────── */
 .order-form { background: var(--white); }
+
+/* Honeypot — приховане поле-пастка для спам-ботів */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
 .order-form h3 {
   font-family: "Montserrat", sans-serif; font-weight: 800;
   font-size: 20px; color: var(--blue); margin-bottom: 6px;
