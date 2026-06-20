@@ -113,16 +113,9 @@ if (savedLang && savedLang !== 'uk') setLang(savedLang);
 
 /* ── Order form ───────────────────────────────────────────── */
 
-// ⚠️ Telegram-бот для отримання заявок з сайту
-const TELEGRAM_BOT_TOKEN = '8827753540:AAF9HEkK6CITVc9fTuOc-6K7r1KjOvbftow';
-
-// Сюди додаєш chat_id всіх, кому мають приходити заявки.
-// Щоб дізнатись chat_id людини: вона пише /start твоєму боту,
-// потім відкриваєш https://api.telegram.org/bot<TOKEN>/getUpdates
-const TELEGRAM_CHAT_IDS = [
-  '1553938904',   // твій chat_id
-  // '0000000000', // ← сюди впишеш chat_id дядька, коли він напише /start боту
-];
+// Заявки з сайту йдуть на Cloudflare Worker — він сам безпечно
+// надсилає повідомлення в Telegram усім підписникам (бот ховає токен).
+const ORDER_API_URL = 'https://dkgrant-form.derevyankomisha2012.workers.dev/order';
 
 const orderForm    = document.getElementById('order-form');
 const formSuccess  = document.getElementById('form-success');
@@ -146,35 +139,17 @@ if (orderForm) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="spinner"></span>';
 
-    // Назви типів вантажу для читабельного повідомлення
-    const cargoLabels = {
-      apartment:    'Квартирний переїзд',
-      office:       'Офісний переїзд',
-      furniture:    'Меблі / техніка',
-      construction: 'Будматеріали',
-      other:        'Інше',
-    };
-
-    const text =
-      '🚛 Нове замовлення з сайту!\n' +
-      `📍 Звідки: ${data.from}\n` +
-      `📍 Куди: ${data.to}\n` +
-      `📦 Вантаж: ${cargoLabels[data.cargo] || data.cargo}\n` +
-      `📅 Дата: ${data.date || 'не вказано'}\n` +
-      `📞 Телефон: ${data.phone}\n` +
-      `💬 Коментар: ${data.comment || 'немає'}`;
-
     try {
-      // Шлемо повідомлення кожному отримувачу окремим запитом
-      await Promise.all(
-        TELEGRAM_CHAT_IDS.map(chatId =>
-          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: chatId, text }),
-          })
-        )
-      );
+      const res = await fetch(ORDER_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+      if (!res.ok || !result.ok) {
+        throw new Error(result.error || 'Server error');
+      }
 
       // Show success
       orderForm.style.display   = 'none';
