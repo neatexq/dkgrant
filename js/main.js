@@ -124,6 +124,17 @@ const submitBtn    = document.getElementById('form-submit');
 // Час відкриття форми — для перевірки на занадто швидке заповнення (боти)
 const formLoadedAt = Date.now();
 
+// Ліміт повторної відправки — раз на 5 хвилин (зберігається навіть після
+// оновлення сторінки, бо лежить у localStorage, а не у пам'яті сторінки).
+const SUBMIT_COOLDOWN_MS = 5 * 60 * 1000; // 5 хвилин
+const LAST_SUBMIT_KEY    = 'dkgrant_last_submit';
+
+function getRemainingCooldown() {
+  const last = parseInt(localStorage.getItem(LAST_SUBMIT_KEY) || '0', 10);
+  const elapsed = Date.now() - last;
+  return Math.max(0, SUBMIT_COOLDOWN_MS - elapsed);
+}
+
 if (orderForm) {
   orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -141,6 +152,17 @@ if (orderForm) {
     const elapsed = Date.now() - formLoadedAt;
     if (elapsed < 3000) {
       console.warn('Спам-бот заблоковано (занадто швидко)');
+      return;
+    }
+
+    // ── Антиспам: не частіше ніж раз на 5 хвилин ──────────────
+    const remaining = getRemainingCooldown();
+    if (remaining > 0) {
+      const minutes = Math.ceil(remaining / 60000);
+      alert(
+        `Заявку вже надіслано. Спробуйте ще раз через ${minutes} хв., ` +
+        `або зателефонуйте нам напряму: 067 538 40 31.`
+      );
       return;
     }
 
@@ -170,6 +192,9 @@ if (orderForm) {
         throw new Error(result.error || 'Server error');
       }
 
+      // Запам'ятовуємо час успішної відправки для антиспам-ліміту
+      localStorage.setItem(LAST_SUBMIT_KEY, String(Date.now()));
+
       // Show success
       orderForm.style.display   = 'none';
       formSuccess.style.display = 'block';
@@ -180,4 +205,11 @@ if (orderForm) {
       alert('Не вдалося відправити заявку. Перевірте інтернет-з\'єднання і спробуйте ще раз, або зателефонуйте нам напряму.');
     }
   });
+
+  // Якщо людина нещодавно вже відправляла заявку (навіть до оновлення
+  // сторінки) — одразу показуємо стан "вже надіслано", не чекаючи кліку.
+  if (getRemainingCooldown() > 0) {
+    orderForm.style.display   = 'none';
+    formSuccess.style.display = 'block';
+  }
 }
