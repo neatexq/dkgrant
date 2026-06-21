@@ -1,0 +1,15 @@
+name = "dkgrant-form"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# KV namespace для rate-limiting
+# Створіть: wrangler kv:namespace create RATE_KV
+# Потім вставте ID нижче
+[[kv_namespaces]]
+binding = "RATE_KV"
+id      = "ЗАМІНІТЬ_НА_ID_ВАШОГО_KV_NAMESPACE"
+
+# Секрети (TG_BOT_TOKEN, TG_CHAT_ID, SITE_TOKEN) задаються через:
+#   wrangler secret put TG_BOT_TOKEN
+#   wrangler secret put TG_CHAT_ID
+# АБО в Dashboard → Workers → Settings → Variables (encrypt)
