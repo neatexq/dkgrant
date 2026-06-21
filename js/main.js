@@ -119,7 +119,7 @@ const ORDER_API_URL = 'https://dkgrant-form.derevyankomisha2012.workers.dev/orde
 // Секретний токен — той самий рядок, що й SITE_TOKEN у worker.js
 // Це не є 100% секретом (видно в JS), але захищає від випадкових
 // скриптів та автоматів. Для повного захисту — лише перевірка Origin на Worker.
-const SITE_TOKEN = 'ЗАМІНІТЬ_НА_ТОЙ_САМИЙ_ТОКЕН_ЩО_У_WORKER';
+const SITE_TOKEN = 'dk_grant_secret_2024_xkq9abc';
 
 const orderForm    = document.getElementById('order-form');
 const formSuccess  = document.getElementById('form-success');
