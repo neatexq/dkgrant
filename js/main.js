@@ -94,8 +94,8 @@ function setLang(lang) {
   });
 
   // SEO meta
-  const titleEl   = document.getElementById('page-title');
-  const descEl    = document.getElementById('meta-desc');
+  const titleEl = document.getElementById('page-title');
+  const descEl  = document.getElementById('meta-desc');
   if (lang === 'uk') {
     titleEl.textContent = 'ДК ГРАНТ — Перевезення скла та склоконструкцій по Києву';
     descEl.content      = 'Перевезення скла, дзеркал, склопакетів, алюмінієвого профілю та великогабаритних конструкцій у Києві. Послуги вантажників. Телефон: 067 538 40 31';
@@ -113,22 +113,14 @@ if (savedLang && savedLang !== 'uk') setLang(savedLang);
 
 /* ── Order form ───────────────────────────────────────────── */
 
-// Worker URL
 const ORDER_API_URL = 'https://dkgrant-form.derevyankomisha2012.workers.dev/order';
 
-// Секретний токен — той самий рядок, що й SITE_TOKEN у worker.js
-// Це не є 100% секретом (видно в JS), але захищає від випадкових
-// скриптів та автоматів. Для повного захисту — лише перевірка Origin на Worker.
-const SITE_TOKEN = ' dk_grant_secret_2024_xkq9abc';
+const orderForm   = document.getElementById('order-form');
+const formSuccess = document.getElementById('form-success');
+const submitBtn   = document.getElementById('form-submit');
 
-const orderForm    = document.getElementById('order-form');
-const formSuccess  = document.getElementById('form-success');
-const submitBtn    = document.getElementById('form-submit');
-
-// Час відкриття сторінки — для timing-перевірки
 const formLoadedAt = Date.now();
 
-// Ліміт повторної відправки — раз на 5 хвилин
 const SUBMIT_COOLDOWN_MS = 5 * 60 * 1000;
 const LAST_SUBMIT_KEY    = 'dkgrant_last_submit';
 
@@ -182,23 +174,18 @@ if (orderForm) {
     // ── Валідація полів ───────────────────────────────────────
     const errors = [];
 
-    // Звідки — мінімум 3 символи, не лише пробіли/цифри
     if (data.from.length < 3 || /^[\d\s]+$/.test(data.from)) {
       errors.push('Вкажіть коректну адресу відправлення (мінімум 3 символи)');
     }
-
-    // Куди — те саме
     if (data.to.length < 3 || /^[\d\s]+$/.test(data.to)) {
       errors.push('Вкажіть коректну адресу призначення (мінімум 3 символи)');
     }
 
-    // Тип вантажу — має бути обраний зі списку
     const validCargo = ['glass', 'mirrors', 'windows', 'aluminum', 'structures', 'other'];
     if (!validCargo.includes(data.cargo)) {
       errors.push('Оберіть тип вантажу зі списку');
     }
 
-    // Дата — якщо вказана, не може бути в минулому
     if (data.date) {
       const chosen = new Date(data.date);
       const today  = new Date();
@@ -208,13 +195,11 @@ if (orderForm) {
       }
     }
 
-    // Телефон — мінімум 10 цифр
     const phoneDigits = data.phone.replace(/\D/g, '');
     if (phoneDigits.length < 10) {
       errors.push('Введіть коректний номер телефону (наприклад +380671234567)');
     }
 
-    // Коментар — якщо є, мінімум 5 символів
     if (data.comment.length > 0 && data.comment.length < 5) {
       errors.push('Коментар занадто короткий (мінімум 5 символів або залиште порожнім)');
     }
@@ -225,23 +210,19 @@ if (orderForm) {
     }
 
     // Show loading state
-    submitBtn.disabled   = true;
-    submitBtn.innerHTML  = '<span class="spinner"></span>';
+    submitBtn.disabled  = true;
+    submitBtn.innerHTML = '<span class="spinner"></span>';
 
     try {
       const res = await fetch(ORDER_API_URL, {
         method:  'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Секретний заголовок — Worker відхиляє запити без нього
-        },
-        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(data),
       });
 
       const result = await res.json();
 
       if (res.status === 429) {
-        // Rate-limit з Worker
         alert('Заявку вже надіслано. Зачекайте 5 хвилин або зателефонуйте: 067 538 40 31.');
         submitBtn.disabled  = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Надіслати заявку</span>';
@@ -252,10 +233,8 @@ if (orderForm) {
         throw new Error(result.error || 'Server error');
       }
 
-      // Запам'ятовуємо час успішної відправки
       localStorage.setItem(LAST_SUBMIT_KEY, String(Date.now()));
 
-      // Show success
       orderForm.style.display   = 'none';
       formSuccess.style.display = 'block';
     } catch (err) {
@@ -266,7 +245,6 @@ if (orderForm) {
     }
   });
 
-  // Якщо людина нещодавно вже відправляла — одразу показуємо success
   if (getRemainingCooldown() > 0) {
     orderForm.style.display   = 'none';
     formSuccess.style.display = 'block';
