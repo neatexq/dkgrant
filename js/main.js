@@ -234,7 +234,6 @@ if (orderForm) {
         headers: {
           'Content-Type': 'application/json',
           // Секретний заголовок — Worker відхиляє запити без нього
-          'X-Site-Token': SITE_TOKEN,
         },
         body: JSON.stringify(data),
       });
