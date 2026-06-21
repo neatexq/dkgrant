@@ -14,7 +14,11 @@ const yearEl = document.getElementById('year');
 const htmlEl = document.documentElement;
 
 const ORDER_API_URL = 'https://dkgrant-form.derevyankomisha2012.workers.dev/order';
-const SITE_TOKEN = 'ЗАМІНІТЬ_НА_ТОЙ_САМИЙ_ТОКЕН_ЩО_У_WORKER';
+const SITE_TOKEN = 'REPLACE_WITH_THE_SAME_ASCII_TOKEN_AS_WORKER';
+const HAS_CONFIGURED_SITE_TOKEN =
+  SITE_TOKEN &&
+  SITE_TOKEN !== 'REPLACE_WITH_THE_SAME_ASCII_TOKEN_AS_WORKER' &&
+  /^[\x00-\x7F]+$/.test(SITE_TOKEN);
 const SUBMIT_COOLDOWN_MS = 5 * 60 * 1000;
 const LAST_SUBMIT_KEY = 'dkgrant_last_submit';
 const DEFAULT_FORM_BUTTON_HTML = '<i class="fa-solid fa-paper-plane"></i> <span data-uk="Надіслати заявку" data-ru="Отправить заявку">Надіслати заявку</span>';
@@ -46,6 +50,7 @@ const messages = {
     success: 'Заявку успішно надіслано. Ми зв’яжемося з вами найближчим часом.',
     networkError: 'Не вдалося відправити заявку. Перевірте інтернет-з’єднання або зателефонуйте нам напряму.',
     genericError: 'Не вдалося обробити заявку. Спробуйте ще раз трохи пізніше.',
+    tokenNotConfigured: 'Форму ще не підключено до сервера. Замініть SITE_TOKEN у js/main.js на ASCII-токен з Cloudflare Worker.',
     serverRateLimit: 'Заявку вже надіслано. Зачекайте 5 хвилин або зателефонуйте нам.',
     serverForbidden: 'Форму тимчасово недоступно. Будь ласка, зателефонуйте нам напряму.',
   },
@@ -62,6 +67,7 @@ const messages = {
     success: 'Заявка успешно отправлена. Мы свяжемся с вами в ближайшее время.',
     networkError: 'Не удалось отправить заявку. Проверьте интернет-соединение или позвоните нам напрямую.',
     genericError: 'Не удалось обработать заявку. Попробуйте ещё раз немного позже.',
+    tokenNotConfigured: 'Форма ещё не подключена к серверу. Замените SITE_TOKEN в js/main.js на ASCII-токен из Cloudflare Worker.',
     serverRateLimit: 'Заявка уже отправлена. Подождите 5 минут или позвоните нам.',
     serverForbidden: 'Форма временно недоступна. Пожалуйста, позвоните нам напрямую.',
   },
@@ -478,6 +484,11 @@ if (orderForm) {
     const errors = validateForm(data);
     if (Object.keys(errors).length > 0) {
       applyValidationResult(errors);
+      return;
+    }
+
+    if (!HAS_CONFIGURED_SITE_TOKEN) {
+      setNotice(getText('tokenNotConfigured'), 'error');
       return;
     }
 
