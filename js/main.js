@@ -14,7 +14,7 @@ const yearEl = document.getElementById('year');
 const htmlEl = document.documentElement;
 
 const ORDER_API_URL = 'https://dkgrant-form.derevyankomisha2012.workers.dev/order';
-const SITE_TOKEN = 'REPLACE_WITH_THE_SAME_ASCII_TOKEN_AS_WORKER';
+const SITE_TOKEN = 'dkgrant_secure_token_2026';
 const HAS_CONFIGURED_SITE_TOKEN =
   SITE_TOKEN &&
   SITE_TOKEN !== 'REPLACE_WITH_THE_SAME_ASCII_TOKEN_AS_WORKER' &&
