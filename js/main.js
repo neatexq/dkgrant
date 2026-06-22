@@ -237,6 +237,7 @@ if (orderForm) {
 
       orderForm.style.display   = 'none';
       formSuccess.style.display = 'block';
+       gtag_report_conversion();
     } catch (err) {
       console.error('Помилка відправки заявки:', err);
       submitBtn.disabled  = false;
