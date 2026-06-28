@@ -300,6 +300,57 @@ section { padding: 90px 24px; }
 .why-title { font-weight: 700; font-size: 17px; color: var(--white); margin-bottom: 8px; }
 .why-desc  { font-size: 14px; color: rgba(255,255,255,0.60); line-height: 1.65; }
 
+/* ── PRICING ─────────────────────────────────────────────── */
+#pricing { background: var(--gray-50); }
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px; margin-top: 52px; max-width: 700px;
+}
+.pricing-card {
+  background: var(--white); border-radius: var(--radius);
+  padding: 36px 28px; border: 1px solid var(--gray-100);
+  text-align: center;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.pricing-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+.pricing-icon {
+  width: 52px; height: 52px; border-radius: 12px; background: rgba(232,160,32,0.12);
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 18px;
+}
+.pricing-icon i { font-size: 20px; color: var(--accent-dark); }
+.pricing-amount {
+  font-family: "Montserrat", sans-serif; font-weight: 800;
+  font-size: 38px; color: var(--blue); line-height: 1; margin-bottom: 10px;
+}
+.pricing-amount span { font-size: 18px; font-weight: 700; }
+.pricing-label { font-weight: 700; font-size: 16px; color: var(--blue); margin-bottom: 8px; }
+.pricing-desc { font-size: 13px; color: var(--gray-500); line-height: 1.55; }
+.pricing-note {
+  margin-top: 32px; font-size: 14px; color: var(--gray-500);
+  max-width: 700px; line-height: 1.65;
+}
+
+/* ── FLEET PHOTO SCROLL ──────────────────────────────────── */
+#fleet { background: var(--white); }
+.fleet-scroll {
+  display: flex; gap: 14px; margin-top: 44px;
+  overflow-x: auto; overflow-y: hidden;
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+.fleet-scroll::-webkit-scrollbar { height: 6px; }
+.fleet-scroll::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 3px; }
+.fleet-scroll::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+.fleet-scroll img {
+  flex-shrink: 0;
+  height: 220px; width: auto; border-radius: var(--radius);
+  object-fit: cover; scroll-snap-align: start;
+  transition: transform var(--transition);
+}
+.fleet-scroll img:hover { transform: scale(1.03); }
+
 /* ── HOW IT WORKS ────────────────────────────────────────── */
 #how { background: var(--gray-50); }
 .steps {
@@ -514,4 +565,5 @@ footer {
   .footer-top { flex-direction: column; }
   .form-row { grid-template-columns: 1fr; }
   #scroll-top { bottom: 20px; right: 16px; }
+  .fleet-scroll img { height: 170px; }
 }

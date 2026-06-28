@@ -94,8 +94,8 @@ function setLang(lang) {
   });
 
   // SEO meta
-  const titleEl = document.getElementById('page-title');
-  const descEl  = document.getElementById('meta-desc');
+  const titleEl   = document.getElementById('page-title');
+  const descEl    = document.getElementById('meta-desc');
   if (lang === 'uk') {
     titleEl.textContent = 'ДК ГРАНТ — Перевезення скла та склоконструкцій по Києву';
     descEl.content      = 'Перевезення скла, дзеркал, склопакетів, алюмінієвого профілю та великогабаритних конструкцій у Києві. Послуги вантажників. Телефон: 067 538 40 31';
@@ -113,19 +113,24 @@ if (savedLang && savedLang !== 'uk') setLang(savedLang);
 
 /* ── Order form ───────────────────────────────────────────── */
 
+// Заявки з сайту йдуть на Cloudflare Worker — він сам безпечно
+// надсилає повідомлення в Telegram усім підписникам (бот ховає токен).
 const ORDER_API_URL = 'https://dkgrant-form.derevyankomisha2012.workers.dev/order';
 
-const orderForm   = document.getElementById('order-form');
-const formSuccess = document.getElementById('form-success');
-const submitBtn   = document.getElementById('form-submit');
+const orderForm    = document.getElementById('order-form');
+const formSuccess  = document.getElementById('form-success');
+const submitBtn    = document.getElementById('form-submit');
 
+// Час відкриття форми — для перевірки на занадто швидке заповнення (боти)
 const formLoadedAt = Date.now();
 
-const SUBMIT_COOLDOWN_MS = 5 * 60 * 1000;
+// Ліміт повторної відправки — раз на 5 хвилин (зберігається навіть після
+// оновлення сторінки, бо лежить у localStorage, а не у пам'яті сторінки).
+const SUBMIT_COOLDOWN_MS = 5 * 60 * 1000; // 5 хвилин
 const LAST_SUBMIT_KEY    = 'dkgrant_last_submit';
 
 function getRemainingCooldown() {
-  const last    = parseInt(localStorage.getItem(LAST_SUBMIT_KEY) || '0', 10);
+  const last = parseInt(localStorage.getItem(LAST_SUBMIT_KEY) || '0', 10);
   const elapsed = Date.now() - last;
   return Math.max(0, SUBMIT_COOLDOWN_MS - elapsed);
 }
@@ -181,7 +186,7 @@ if (orderForm) {
       errors.push('Вкажіть коректну адресу призначення (мінімум 3 символи)');
     }
 
-    const validCargo = ['glass', 'mirrors', 'windows', 'aluminum', 'structures', 'other'];
+    const validCargo = ['glass', 'mirrors', 'windows', 'slabs', 'aluminum', 'structures', 'other'];
     if (!validCargo.includes(data.cargo)) {
       errors.push('Оберіть тип вантажу зі списку');
     }
@@ -237,7 +242,6 @@ if (orderForm) {
 
       orderForm.style.display   = 'none';
       formSuccess.style.display = 'block';
-       gtag_report_conversion();
     } catch (err) {
       console.error('Помилка відправки заявки:', err);
       submitBtn.disabled  = false;
